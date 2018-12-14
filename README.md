@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Low-shot Learning by Shrinking and Hallucinating Features
 
 This repository contains code associated with the following paper:<br>
@@ -250,3 +251,34 @@ _Top-5, All classes_
 | Baseline (Resnet 50)|  Generation	       | 63.14	| 71.45	| 78.76	| 82.55	 | 85.35 |
 | SGM (Resnet 50)	  |  Baseline	       | 60.02	| 71.28	| 79.95	| 83.27	 | 85.19 |
 | SGM (Resnet 50)     |  Generation	       | 63.60	| 71.53	| 79.95	| 83.27	 | 85.16 |
+=======
+# README #
+
+This README would normally document whatever steps are necessary to get your application up and running.
+
+### What is this repository for? ###
+
+* Quick summary
+* Version
+* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+
+### How do I get set up? ###
+
+* Summary of set up
+* Configuration
+* Dependencies
+* Database configuration
+* How to run tests
+* Deployment instructions
+
+### Contribution guidelines ###
+
+* Writing tests
+* Code review
+* Other guidelines
+
+### Who do I talk to? ###
+
+* Repo owner or admin
+* Other community or team contact
+>>>>>>> a9373980a5c05d683626544a52792dbcaeb53516
