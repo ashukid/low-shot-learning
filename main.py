@@ -5,7 +5,6 @@
 # LICENSE file in the root directory of this source tree.
 
 
-
 import ResNetFeat
 import torch
 from torch.autograd import Variable
@@ -19,6 +18,18 @@ import os
 import glob
 import numpy as np
 import losses
+import json
+
+
+with open('base_classes.json') as f:
+    base_classes=json.load(f)
+
+with open('novel_classes.json') as f:
+    novel_classes=json.load(f)
+    
+#base_classes=(1,4)
+#novel_classes=(0,2,3,5,6,7,8,9)
+#{'airplane': 0,'automobile': 1,'bird': 2,'cat': 3,'deer': 4,'dog': 5,'frog': 6,'horse': 7,'ship': 8,'truck': 9}
 
 def accuracy(scores, labels):
     topk_scores, topk_labels = scores.topk(5, 1, True, True)
@@ -35,12 +46,6 @@ def adjust_learning_rate(optimizer, epoch, params):
         lr = params.warmup_lr
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
-
-
-
-
-
-
 
 
 def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, stop_epoch, params):
@@ -65,6 +70,19 @@ def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, st
 
         #train
         for i, (x,y) in enumerate(train_loader):
+            
+            # ignoring the data that belong to novel class
+            index=0
+            while True:
+                if(y[index] not in base_classes):
+                    y=torch.cat([y[0:index], y[index+1:]])
+                    x=torch.cat([x[0:index], x[index+1:]])
+                    index-=1
+                index+=1
+                
+                if(len(y)==index):
+                    break
+                    
             data_time = data_time + (time.time()-start_data_time)
             x = x.cuda()
             y = y.cuda()
@@ -95,6 +113,21 @@ def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, st
         top5=0
         count = 0
         for i, (x,y) in enumerate(val_loader):
+            
+            # ignoring the data that belong to novel class
+            index=0
+            while True:
+                
+                if(y[index] not in base_classes):
+                    y=torch.cat([y[0:index], y[index+1:]])
+                    x=torch.cat([x[0:index], x[index+1:]])
+                    index-=1
+                index+=1
+                
+                if(len(y)==index):
+                    break
+                
+                    
             data_time = data_time + (time.time()-start_data_time)
             x = x.cuda()
             y = y.cuda()
@@ -134,13 +167,13 @@ def parse_args():
     parser.add_argument('--print_freq', default=10, type=int,help='Print frequecy')
     parser.add_argument('--save_freq', default=10, type=int, help='Save frequency')
     parser.add_argument('--start_epoch', default=0, type=int,help ='Starting epoch')
-    parser.add_argument('--stop_epoch', default=90, type=int, help ='Stopping epoch')
+    parser.add_argument('--stop_epoch', default=20, type=int, help ='Stopping epoch')
     parser.add_argument('--allow_resume', default=0, type=int)
-    parser.add_argument('--resume_file', default=None, help='resume from file')
+    parser.add_argument('--resume_file', default='', help='resume from file')
     parser.add_argument('--checkpoint_dir', required=True, help='Directory for storing check points')
     parser.add_argument('--aux_loss_type', default='l2', type=str, help='l2 or sgm or batchsgm')
     parser.add_argument('--aux_loss_wt', default=0.1, type=float, help='loss_wt')
-    parser.add_argument('--num_classes',default=1000, type=float, help='num classes')
+    parser.add_argument('--num_classes',default=10, type=float, help='num classes')
     parser.add_argument('--dampening', default=0, type=float, help='dampening')
     parser.add_argument('--warmup_epochs', default=0, type=int, help='iters for warmup')
     parser.add_argument('--warmup_lr', default=0.01, type=int, help='lr for warmup')

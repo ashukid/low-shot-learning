@@ -45,7 +45,7 @@ def get_data_loader(params):
     transform = transforms.Compose(transform_list)
 
 
-    dataset = dataset_dict[dataset_type](transform=transform, **dataset_params)
+    dataset = dataset_dict[dataset_type](transform=transform,**dataset_params)
     data_loader_params = params['data_loader_params']
     data_loader = torch.utils.data.DataLoader(dataset, **data_loader_params)
     return data_loader

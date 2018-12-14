@@ -19,7 +19,7 @@ def get_one_hot(labels, num_classes):
     if (type(labels.data) is torch.cuda.FloatTensor) or (type(labels.data) is torch.cuda.LongTensor):
         one_hot = one_hot.cuda()
 
-
+    one_hot=one_hot.cuda()
     one_hot = one_hot.eq(labels.unsqueeze(1).expand_as(one_hot).float()).float()
     return one_hot
 

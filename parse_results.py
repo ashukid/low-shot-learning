@@ -28,7 +28,7 @@ if __name__=='__main__':
     else:
         outpath = '{}_' + 'lr_{:.3f}_wd_{:.3f}'.format(args.lr, args.wd) + '_expid_{:d}_lowshotn_{:d}_' + 'maxgen_{:d}.json'.format(args.max_per_label)
     lowshotns = [1,2,5,10,20]
-    expids = [1,2,3,4,5]
+    expids = [1]
     all_nums = np.zeros((len(lowshotns), len(expids), 6))
     for i, ei in enumerate(expids):
         for j, ln in enumerate(lowshotns):

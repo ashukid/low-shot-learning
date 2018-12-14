@@ -152,11 +152,11 @@ def parse_args():
     parser.add_argument('--trainfile', required=True, type=str)
     parser.add_argument('--testfile', required=True, type=str)
     parser.add_argument('--testsetup', default=0, type=int, help='test setup or validation setup?')
-    parser.add_argument('--numclasses', default=1000, type=int)
+    parser.add_argument('--numclasses', default=10, type=int)
     parser.add_argument('--lr', default=0.1, type=float)
     parser.add_argument('--momentum', default=0.9, type=float)
     parser.add_argument('--wd', default=0.001, type=float)
-    parser.add_argument('--maxiters', default=10000, type=int)
+    parser.add_argument('--maxiters', default=1000, type=int)
     parser.add_argument('--batchsize', default=1000, type=int)
     parser.add_argument('--outdir', type=str, help='output directory for results')
     parser.add_argument('--max_per_label', default=0, type=int, help='number to generate')
@@ -171,6 +171,7 @@ if __name__ == '__main__':
         lowshotmeta = json.load(f)
     accs = np.zeros(6)
 
+    
     with open(params.experimentpath.format(params.experimentid),'r') as f:
         exp = json.load(f)
     novel_idx = np.array(exp)[:,:params.lowshotn]
