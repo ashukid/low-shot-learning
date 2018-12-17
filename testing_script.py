@@ -30,6 +30,7 @@ momentum=0.9
 wd=0.001
 
 
+######################################################################################################################
 def get_model(model_name, num_classes):
     model_dict = dict(ResNet10 = ResNetFeat.ResNet10,
                 ResNet18 = ResNetFeat.ResNet18,
@@ -37,8 +38,11 @@ def get_model(model_name, num_classes):
                 ResNet50 = ResNetFeat.ResNet50,
                 ResNet101 = ResNetFeat.ResNet101)
     return model_dict[model_name](num_classes, False)
+#*********************************************************************************************************************
 
 
+
+######################################################################################################################
 def get_features(model,data_loader):
     
     feature_set=[]
@@ -72,10 +76,11 @@ def get_features(model,data_loader):
         label_set.extend(y.cpu().numpy())
         
     return (np.array(feature_set),np.array(label_set))
+#*********************************************************************************************************************
 
 
 
-
+######################################################################################################################
 def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000, maxiters=1000):
     featdim = features.shape[1]
     model = nn.Linear(featdim, num_classes)
@@ -100,8 +105,11 @@ def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000
             print('{:d}: {:f}'.format(i, loss.data[0]))
 
     return model
+#*********************************************************************************************************************
 
 
+
+######################################################################################################################
 def testing_loop(one_shot_model,val_features,val_labels):
     one_shot_model=one_shot_model.eval()
     
@@ -116,12 +124,16 @@ def testing_loop(one_shot_model,val_features,val_labels):
         total+=x
     total=total.numpy()
     print('mean accuracy : {}%'.format(total))
+#*********************************************************************************************************************
 
     
+    
+    
+######################################################################################################################    
 if __name__ == '__main__':
+    
     with open(cfg,'r') as f:
         data_params = yaml.load(f)
-
     data_loader = data.get_data_loader(data_params)
     
     with open(val_cfg,'r') as f:
@@ -138,10 +150,12 @@ if __name__ == '__main__':
     model.load_state_dict(tmp['state'])
     model.eval()
     
+    # extracting features for training dataset and testing dataset
     feature_set,label_set=get_features(model,data_loader)
     val_feature_set,val_label_set = get_features(model,val_loader)
     
+    # training the one shot model (last layers)
     one_shot_model = training_loop(feature_set,label_set, num_classes, lr, momentum, wd, batch_size, maxiters)
     
+    # testing the one shot dataset
     testing_loop(one_shot_model,val_feature_set,val_label_set)
-
