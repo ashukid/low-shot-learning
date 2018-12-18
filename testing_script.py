@@ -30,7 +30,6 @@ momentum=0.9
 wd=0.001
 
 
-######################################################################################################################
 def get_model(model_name, num_classes):
     model_dict = dict(ResNet10 = ResNetFeat.ResNet10,
                 ResNet18 = ResNetFeat.ResNet18,
@@ -38,11 +37,9 @@ def get_model(model_name, num_classes):
                 ResNet50 = ResNetFeat.ResNet50,
                 ResNet101 = ResNetFeat.ResNet101)
     return model_dict[model_name](num_classes, False)
-#*********************************************************************************************************************
 
 
 
-######################################################################################################################
 def get_features(model,data_loader):
     
     feature_set=[]
@@ -76,11 +73,9 @@ def get_features(model,data_loader):
         label_set.extend(y.cpu().numpy())
         
     return (np.array(feature_set),np.array(label_set))
-#*********************************************************************************************************************
 
 
 
-######################################################################################################################
 def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000, maxiters=1000):
     featdim = features.shape[1]
     model = nn.Linear(featdim, num_classes)
@@ -105,11 +100,9 @@ def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000
             print('{:d}: {:f}'.format(i, loss.data[0]))
 
     return model
-#*********************************************************************************************************************
 
 
 
-######################################################################################################################
 def testing_loop(one_shot_model,val_features,val_labels):
     one_shot_model=one_shot_model.eval()
     
@@ -125,12 +118,10 @@ def testing_loop(one_shot_model,val_features,val_labels):
         
     acc=total/len(val_features)
     print('\n---> mean accuracy : {:.2f}%'.format(acc*100))
-#*********************************************************************************************************************
 
     
     
     
-######################################################################################################################    
 if __name__ == '__main__':
     
     with open(cfg,'r') as f:
@@ -151,7 +142,6 @@ if __name__ == '__main__':
     model.load_state_dict(tmp['state'])
     model.eval()
     
-    # one shot training data with shuffle
     # extracting features for training dataset and testing dataset
     feature_set,label_set=get_features(model,data_loader)
     idx=np.arange(len(feature_set))
