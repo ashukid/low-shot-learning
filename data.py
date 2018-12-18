@@ -10,7 +10,7 @@ from PIL import Image
 import numpy as np
 import torchvision.transforms as transforms
 import myMetaDataset
-import torchvision.datasets as dsets
+import vision.torchvision.datasets as dsets
 import additional_transforms
 dataset_dict = dict(MetaDataset=myMetaDataset.MetaDataset,
                     CocoDetection=dsets.CocoDetection,
