@@ -106,16 +106,17 @@ def testing_loop(one_shot_model,val_features,val_labels):
     one_shot_model=one_shot_model.eval()
     
     total=0
-    for i in range(100):
+    for i in range(len(val_features)):
         idx=i%len(val_labels)
         (x,y) = torch.tensor(np.array([val_features[idx]])),torch.tensor(np.array([val_labels[idx]]))
         
         x = Variable(x.cuda())
         scores = one_shot_model(x)
-        x=np.argmax(scores.data)==y[0]
-        total+=x
-    total=total.numpy()
-    print('mean accuracy : {}%'.format(total))
+        x=(np.argmax(scores.data)==y[0]).data.numpy()
+        total = total + x
+        
+    acc=total/len(val_features)
+    print('\n---> mean accuracy : {:.2f}%'.format(acc*100))
 
     
 if __name__ == '__main__':
@@ -138,8 +139,19 @@ if __name__ == '__main__':
     model.load_state_dict(tmp['state'])
     model.eval()
     
+    # one shot training data with shuffle
     feature_set,label_set=get_features(model,data_loader)
+    idx=np.arange(len(feature_set))
+    np.random.shuffle(idx)
+    feature_set=feature_set[idx]
+    label_set=label_set[idx]
+    
+    # one shot validation data with shuffle
     val_feature_set,val_label_set = get_features(model,val_loader)
+    idx=np.arange(len(val_feature_set))
+    np.random.shuffle(idx)
+    val_feature_set=val_feature_set[idx]
+    val_label_set=val_label_set[idx]
     
     one_shot_model = training_loop(feature_set,label_set, num_classes, lr, momentum, wd, batch_size, maxiters)
     
