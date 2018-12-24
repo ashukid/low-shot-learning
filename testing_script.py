@@ -20,9 +20,9 @@ with open('novel_classes.json') as f:
 
 cfg='train_save_data.yaml'
 val_cfg='val_save_data.yaml'
-modelfile='checkpoints/ResNet10_sgm/19.tar'
+modelfile='./models/checkpoints/ResNet10_sgm/89.tar'
 model='ResNet10'
-num_classes=10
+num_classes=10378
 batch_size=16
 maxiters=1000
 lr=0.1
@@ -63,8 +63,7 @@ def get_features(model,data_loader):
             continue
             
         
-        if i%10 == 0:
-            print('{:d}/{:d}'.format(i, len(data_loader)))
+        print('{:d}/{:d}'.format(i, len(data_loader)))
         x = x.cuda()
         x_var = Variable(x)
         
@@ -84,10 +83,11 @@ def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000
 
     loss_function = nn.CrossEntropyLoss()
     loss_function = loss_function.cuda()
-    
+    idx=0
     for i in range(maxiters):
-        idx=i%len(labels)
-        (x,y) = torch.tensor(np.array([features[idx]])),torch.tensor(np.array([labels[idx]]))
+        
+        
+        (x,y) = torch.tensor(features[idx:idx+batch_size]),torch.tensor(labels[idx:idx+batch_size])
         optimizer.zero_grad()
 
         x = Variable(x.cuda())
@@ -98,6 +98,10 @@ def training_loop(features,labels, num_classes, lr, momentum, wd, batchsize=1000
         optimizer.step()
         if (i%100==0):
             print('{:d}: {:f}'.format(i, loss.data[0]))
+            
+        # change index values
+        idx+=batch_size
+        idx=idx%len(labels)
 
     return model
 
@@ -139,10 +143,19 @@ if __name__ == '__main__':
     if ('module.classifier.bias' not in model.state_dict().keys()) and ('module.classifier.bias' in tmp['state'].keys()):
         tmp['state'].pop('module.classifier.bias')
     
-    model.load_state_dict(tmp['state'])
+    
+    ########################################################################
+    # tweak to learn for just imagenet
+    pretrained_dict=tmp['state']
+    model_dict = model.state_dict()
+    pretrained_dict['module.classifier.weight']=model_dict['module.classifier.weight']
+#     model.load_state_dict(pretrained_dict)
     model.eval()
+    ########################################################################
+    
     
     # extracting features for training dataset and testing dataset
+    print('Train set')
     feature_set,label_set=get_features(model,data_loader)
     idx=np.arange(len(feature_set))
     np.random.shuffle(idx)
@@ -150,11 +163,13 @@ if __name__ == '__main__':
     label_set=label_set[idx]
     
     # one shot validation data with shuffle
+    print('Val set')
     val_feature_set,val_label_set = get_features(model,val_loader)
     idx=np.arange(len(val_feature_set))
     np.random.shuffle(idx)
     val_feature_set=val_feature_set[idx]
     val_label_set=val_label_set[idx]
+    
     
     # training the one shot model (last layers)
     one_shot_model = training_loop(feature_set,label_set, num_classes, lr, momentum, wd, batch_size, maxiters)

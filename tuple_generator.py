@@ -4,7 +4,7 @@ import argparse
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
-    parser.add_argument('--dataset_folder', default='cifar/train/root/', help='root folder of dataset')
+    parser.add_argument('--dataset_folder', default='LouisVuitton', help='root folder of dataset')
     return parser.parse_args()
 
 
@@ -16,7 +16,7 @@ class_folders=os.listdir(dataset_folder)
 class_folders.sort()
 
 idx=0
-threshold=300
+threshold=150
 for folders in class_folders:
     path=os.path.join(dataset_folder,folders)
     if(os.path.isdir(path)):

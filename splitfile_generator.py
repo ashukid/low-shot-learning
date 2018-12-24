@@ -14,6 +14,7 @@ for idx in range(len(labels)):
 
 nshot=20
 unique_label=np.unique(labels)
+print(len(unique_label))
 data_index=[]
 for i in range(len(unique_label)):
     data_index.append(data_dict[i][:nshot])

@@ -56,7 +56,7 @@ def parse_args():
     parser.add_argument('--outfile', required=True, help='save file')
     parser.add_argument('--modelfile', required=True, help='model file')
     parser.add_argument('--model', type=str, default='ResNet10', help='model')
-    parser.add_argument('--num_classes', type=int,default=10)
+    parser.add_argument('--num_classes', type=int,default=10378)
     return parser.parse_args()
 
 if __name__ == '__main__':
