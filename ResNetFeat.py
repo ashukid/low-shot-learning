@@ -9,6 +9,8 @@ import ResNetBasic
 import torch
 import torch.nn as nn
 from torch.autograd import Variable
+import torch.utils.model_zoo as model_zoo
+
 
 # Modification of ResNet so that it also outputs a feature vector
 class ResNetFeat(ResNetBasic.ResNet):
@@ -42,7 +44,8 @@ def ResNet50(num_classes=1000, only_trunk=False):
     return ResNetFeat(ResNetBasic.BottleneckBlock, [3,4,6,3], [256,512,1024,2048], num_classes, only_trunk, classifier_has_bias=False)
 
 def ResNet101(num_classes=1000, only_trunk=False):
-    return ResNetFeat(ResNetBasic.BottleneckBlock, [3,4,23,3],[256,512,1024,2048], num_classes, only_trunk, classifier_has_bias=False)
+    model =  ResNetFeat(ResNetBasic.BottleneckBlock, [3,4,23,3],[256,512,1024,2048], num_classes, only_trunk, classifier_has_bias=False)
+    return model
 
 
 

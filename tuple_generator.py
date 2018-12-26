@@ -5,18 +5,20 @@ import argparse
 def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
     parser.add_argument('--dataset_folder', default='LouisVuitton', help='root folder of dataset')
+    parser.add_argument('--threshold', default='150', help='threshold above which classes are base')
     return parser.parse_args()
 
 
 params=parse_args()
 dataset_folder=params.dataset_folder
+threshold=params.threshold
+
 base_classes=[]
 novel_classes=[]
 class_folders=os.listdir(dataset_folder)
 class_folders.sort()
 
 idx=0
-threshold=150
 for folders in class_folders:
     path=os.path.join(dataset_folder,folders)
     if(os.path.isdir(path)):

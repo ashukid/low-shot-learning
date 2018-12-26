@@ -27,6 +27,7 @@ with open('base_classes.json') as f:
 with open('novel_classes.json') as f:
     novel_classes=json.load(f)
     
+# print("Total classes : {}".format(len(base_classes)+len(novel_classes)))
 #base_classes=(1,4)
 #novel_classes=(0,2,3,5,6,7,8,9)
 #{'airplane': 0,'automobile': 1,'bird': 2,'cat': 3,'deer': 4,'dog': 5,'frog': 6,'horse': 7,'ship': 8,'truck': 9}
@@ -57,7 +58,7 @@ def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, st
 
     optimizer = torch.optim.SGD(model.parameters(), params.lr, momentum=params.momentum, weight_decay=params.weight_decay, dampening=params.dampening)
     for epoch in range(start_epoch,stop_epoch):
-        adjust_learning_rate(optimizer, epoch, params)
+        #adjust_learning_rate(optimizer, epoch, params)
         model.train()
 
 
@@ -82,7 +83,10 @@ def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, st
                 
                 if(len(y)==index):
                     break
-                    
+             
+            if(len(y)==0):
+                continue
+                
             data_time = data_time + (time.time()-start_data_time)
             x = x.cuda()
             y = y.cuda()
@@ -127,7 +131,9 @@ def main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, st
                 if(len(y)==index):
                     break
                 
-                    
+            if(len(y)==0):
+                continue
+                
             data_time = data_time + (time.time()-start_data_time)
             x = x.cuda()
             y = y.cuda()
@@ -158,7 +164,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Main training script')
     parser.add_argument('--traincfg', required=True, help='yaml file containing config for data')
     parser.add_argument('--valcfg', required=True, help='yaml file containing config for data')
-    parser.add_argument('--model', default='ResNet18', help='model: ResNet{10|18|34|50}')
+    parser.add_argument('--model', default='ResNet10', help='model: ResNet{10|18|34|50}')
     parser.add_argument('--lr', default=0.1, type=float, help='Initial learning rate')
     parser.add_argument('--momentum', default=0.9, type=float, help='Momentum')
     parser.add_argument('--weight_decay', default=0.0001, type=float, help='Weight decay')
@@ -167,13 +173,13 @@ def parse_args():
     parser.add_argument('--print_freq', default=10, type=int,help='Print frequecy')
     parser.add_argument('--save_freq', default=10, type=int, help='Save frequency')
     parser.add_argument('--start_epoch', default=0, type=int,help ='Starting epoch')
-    parser.add_argument('--stop_epoch', default=20, type=int, help ='Stopping epoch')
-    parser.add_argument('--allow_resume', default=0, type=int)
-    parser.add_argument('--resume_file', default='', help='resume from file')
-    parser.add_argument('--checkpoint_dir', required=True, help='Directory for storing check points')
-    parser.add_argument('--aux_loss_type', default='l2', type=str, help='l2 or sgm or batchsgm')
+    parser.add_argument('--stop_epoch', default=100, type=int, help ='Stopping epoch')
+    parser.add_argument('--allow_resume', default=1, type=int)
+    parser.add_argument('--resume_file', default='./models/checkpoints/ResNet10_sgm/89.tar', help='resume from file')
+    parser.add_argument('--checkpoint_dir', default='', help='Directory for storing check points')
+    parser.add_argument('--aux_loss_type', default='sgm', type=str, help='l2 or sgm or batchsgm')
     parser.add_argument('--aux_loss_wt', default=0.1, type=float, help='loss_wt')
-    parser.add_argument('--num_classes',default=10, type=float, help='num classes')
+    parser.add_argument('--num_classes',default=10378, type=float, help='num classes')
     parser.add_argument('--dampening', default=0, type=float, help='dampening')
     parser.add_argument('--warmup_epochs', default=0, type=int, help='iters for warmup')
     parser.add_argument('--warmup_lr', default=0.01, type=int, help='lr for warmup')
@@ -240,8 +246,14 @@ if __name__=='__main__':
     if params.allow_resume:
         resume_file = get_resume_file(params.resume_file)
         if resume_file is not None:
+            print('\nReading checkpoints !!')
             tmp = torch.load(resume_file)
             start_epoch = tmp['epoch']+1
-            model.load_state_dict(tmp['state'])
+            
+            # loading pretrained imagenet model
+            pretrained_dict=tmp['state']
+            model_dict = model.state_dict()
+            pretrained_dict['module.classifier.weight']=model_dict['module.classifier.weight']
+            model.load_state_dict(pretrained_dict)
 
     model = main_training_loop(train_loader, val_loader, model, loss_fn, start_epoch, stop_epoch, params)

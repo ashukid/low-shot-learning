@@ -1,6 +1,6 @@
 dataset_type: 'ImageFolder'
 dataset_params:
-    root: './cifar/train/'
+    root: './new-folder/train'
     #meta: 'train.json'
 transform_params:
   transform_list: ['Scale','CenterCrop', 'ToTensor', 'Normalize']

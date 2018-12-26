@@ -20,11 +20,11 @@ with open('novel_classes.json') as f:
 
 cfg='train_save_data.yaml'
 val_cfg='val_save_data.yaml'
-modelfile='./models/checkpoints/ResNet10_sgm/89.tar'
+modelfile='./checkpoints/ResNet10_sgm/99.tar'
 model='ResNet10'
 num_classes=10378
 batch_size=16
-maxiters=1000
+maxiters=10000
 lr=0.1
 momentum=0.9
 wd=0.001
@@ -149,7 +149,7 @@ if __name__ == '__main__':
     pretrained_dict=tmp['state']
     model_dict = model.state_dict()
     pretrained_dict['module.classifier.weight']=model_dict['module.classifier.weight']
-#     model.load_state_dict(pretrained_dict)
+    model.load_state_dict(pretrained_dict)
     model.eval()
     ########################################################################
     
