@@ -12,6 +12,7 @@ import json
 import additional_transforms
 import torchvision.transforms as transforms
 import argparse
+import ResNetFeat
 
 
 def get_model(model_name, num_classes):
@@ -38,10 +39,10 @@ def parse_transform(transform_type, transform_params):
         return method()
     
 
-def image_loader(image_name):
+def image_loader(image_name,transform):
     """load image, returns cuda tensor"""
     image = Image.open(image_name)
-    image = loader(image).float()
+    image = transform(image).float()
     image = Variable(image)
     image = image.unsqueeze(0)
     return image.cuda()  #assumes that you're using GPU
@@ -52,19 +53,19 @@ def get_features(model,image):
     return feats.data.cpu().numpy()
 
 def testing_loop(model,x):
-    
-    model=model.eval()
+    x = torch.tensor(x)
     x = Variable(x.cuda())
     scores = model(x)
-    print('Prediction : {}'.format(np.argmax(scores.data).cpu().numpy()))
+    print('\nPrediction Class : {}\n'.format(np.argmax(scores.data).cpu().numpy()))
 
 
 def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
+    parser.add_argument('--model',default='ResNet10',help='base model')
     parser.add_argument('--config', required=True, help='image transformation parameters for testing')
     parser.add_argument('--image_path', required=True, help='testing image path')
     parser.add_argument('--modelfile', required=True, help='base trained model')
-    parser.add_argument('--num_classes', deafult=10378, help='number of classes')
+    parser.add_argument('--num_classes', default=10378,type=int, help='number of classes')
     
     
     
@@ -77,10 +78,10 @@ with open(params.config,'r') as f:
 transform_params=test_params['transform_params']
 transform_list = [parse_transform(x, transform_params) for x in transform_params['transform_list']]
 transform = transforms.Compose(transform_list)
-image = image_loader(params.image_path)
+image = image_loader(params.image_path,transform)
 
 # loading base class model and getting features
-model = get_model(model, params.num_classes)
+model = get_model(params.model, params.num_classes)
 model = model.cuda()
 model = torch.nn.DataParallel(model)
 tmp = torch.load(params.modelfile)
@@ -89,12 +90,13 @@ if ('module.classifier.bias' not in model.state_dict().keys()) and ('module.clas
     
 model.load_state_dict(tmp['state'])
 model.eval()
-image_feature=get_feature(model,image)
-
+image_feature=get_features(model,image)
 
 # loading finetuned model and getting prediction
-json_data=open('finetune_model.json')
-json_data=json_data.read()
-finetune_model=keras.models.load_from_json(json_data)
-finetune_model.load_weights('finetune_model.h5')
-testing_loop(finetune_model,image)
+finetune_model= nn.Linear(image_feature.shape[1], params.num_classes)
+finetune_model = finetune_model.cuda()
+tmp=torch.load('finetuned_model.pth')
+finetune_model.load_state_dict(tmp)
+finetune_model.eval()
+
+testing_loop(finetune_model,image_feature)

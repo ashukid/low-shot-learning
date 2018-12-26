@@ -5,7 +5,7 @@ import argparse
 def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
     parser.add_argument('--dataset_folder', default='LouisVuitton', help='root folder of dataset')
-    parser.add_argument('--threshold', default='150', help='threshold above which classes are base')
+    parser.add_argument('--threshold', default=150,  type=int, help='threshold above which classes are base')
     return parser.parse_args()
 
 

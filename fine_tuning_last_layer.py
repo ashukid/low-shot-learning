@@ -14,15 +14,12 @@ import json
 def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
     parser.add_argument('--trainfile', default='features/new-folder/train.hdf5', help='path for training data features')
-    parser.add_argument('--testfile', default='features/new-folder/val.hdf5', help='path for training data features')
-    parser.add_argument('--num_classes',default=10378,help='number of classes')
-    parser.add_argument('--batchsize',default=32,help='batch size')
-    parser.add_argument('--lr',default=0.1,help='learning rate')
-    parser.add_argument('--momentum',default=0.9,help='momentum')
-    parser.add_argument('--wd',default=0.001,help='weight decay')
-    parser.add_argument('--maxiters',default=1000,help='total iteration for fine tuning')
-    
-    
+    parser.add_argument('--num_classes',default=10378, type=int, help='number of classes')
+    parser.add_argument('--batchsize',default=32, type=int, help='batch size')
+    parser.add_argument('--lr',default=0.1, type=int, help='learning rate')
+    parser.add_argument('--momentum',default=0.9, type=int, help='momentum')
+    parser.add_argument('--wd',default=0.001, type=int, help='weight decay')
+    parser.add_argument('--maxiters',default=1000, type=int, help='total iteration for fine tuning')
     
     return parser.parse_args()
 
@@ -37,7 +34,6 @@ with open('novel_classes.json') as f:
     novel_classes=json.load(f)
 
 trainfile=params.trainfile
-testfile=params.testfile
 num_classes=params.num_classes
 batchsize=params.batchsize
 lr=params.lr
@@ -75,7 +71,7 @@ def training_loop(data_loader):
     loss_function = nn.CrossEntropyLoss()
     loss_function = loss_function.cuda()
     
-    for _ in range(maxiters):
+    for it in range(maxiters):
         
         for i,(x,y) in enumerate(data_loader):
 
@@ -102,8 +98,9 @@ def training_loop(data_loader):
             loss = loss_function(scores,y)
             loss.backward()
             optimizer.step()
-            if (i%100==0):
-                print('{:d}: {:f}'.format(i, loss.data[0]))
+            
+            if (it%100==0):
+                print('{:d}: {:f}'.format(it, loss.data[0]))
             
     return model
 
@@ -113,6 +110,5 @@ if __name__ == '__main__':
         train_loader=get_loader(f)
     
     model=training_loop(train_loader)
-    model_json=model.to_json('finetuned_model.json')
-    model.save_weights('finetuned_model.h5')
-        
+    # save finetuned model
+    torch.save(model.state_dict(),'finetuned_model.pth')

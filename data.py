@@ -11,8 +11,7 @@ import numpy as np
 import torchvision.transforms as transforms
 import vision.torchvision.datasets as dsets
 import additional_transforms
-dataset_dict = dict(MetaDataset=myMetaDataset.MetaDataset,
-                    CocoDetection=dsets.CocoDetection,
+dataset_dict = dict(CocoDetection=dsets.CocoDetection,
                     CocoCaptions=dsets.CocoCaptions,
                     LSUN=dsets.LSUN,
                     CIFAR10=dsets.CIFAR10,

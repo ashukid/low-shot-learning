@@ -7,7 +7,6 @@
 
 import torch
 from torch.autograd import Variable
-import myMetaDataset
 import ResNetFeat
 import yaml
 import data

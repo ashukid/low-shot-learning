@@ -10,7 +10,7 @@ def parse_args():
     parser = argparse.ArgumentParser(description='Class separating script')
     parser.add_argument('--dataset_folder', default='LouisVuitton', help='root folder of dataset')
     parser.add_argument('--test_folder', default='LouisVuitton-test', help='root folder of test dataset')
-    parser.add_argument('--test_images', default='20', help='no of test images')
+    parser.add_argument('--test_images', default=20,type=int, help='no of test images')
     return parser.parse_args()
 
 
@@ -26,7 +26,7 @@ folders.sort()
 try:
     os.makedirs(test_folder)
 except FileExistsError:
-    continue
+    print('Test folder exist')
 
 # creating folders for each classes inside test folder
 for f in folders:

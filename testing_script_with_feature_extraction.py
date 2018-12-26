@@ -20,7 +20,7 @@ with open('novel_classes.json') as f:
 
 cfg='train_save_data.yaml'
 val_cfg='val_save_data.yaml'
-modelfile='./checkpoints/ResNet10_sgm/99.tar'
+modelfile='./models/checkpoints/ResNet10_l2/89.tar'
 model='ResNet10'
 num_classes=10378
 batch_size=16
@@ -143,7 +143,16 @@ if __name__ == '__main__':
     if ('module.classifier.bias' not in model.state_dict().keys()) and ('module.classifier.bias' in tmp['state'].keys()):
         tmp['state'].pop('module.classifier.bias')
     
-    model.load_state_dict(tmp['state'])
+    
+#     loading pretrained imagenet model
+    pretrained_dict=tmp['state']
+    model_dict = model.state_dict()
+    pretrained_dict['module.classifier.weight']=model_dict['module.classifier.weight']
+    
+    
+    model.load_state_dict(pretrained_dict)
+#     model.load_state_dict(tmp['state'])
+
     model.eval()
     
     # extracting features for training dataset and testing dataset

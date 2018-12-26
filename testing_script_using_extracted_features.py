@@ -116,15 +116,9 @@ def testing_loop(data_loader, model):
         all_labels = y.numpy() if all_labels is None else np.concatenate((all_labels, y.numpy()))
 
     is_novel = np.in1d(all_labels, novel_classes)
-    is_base = np.in1d(all_labels, base_classes)
-    is_either = is_novel | is_base
     top1_novel = np.mean(top1[is_novel])
-    top1_base = np.mean(top1[is_base])
-    top1_all = np.mean(top1[is_either])
     top5_novel = np.mean(top5[is_novel])
-    top5_base = np.mean(top5[is_base])
-    top5_all = np.mean(top5[is_either])
-    return np.array([top1_novel, top5_novel, top1_base, top5_base, top1_all, top5_all])
+    return np.array([top1_novel, top5_novel])
 
 
 if __name__ == '__main__':
@@ -136,5 +130,5 @@ if __name__ == '__main__':
     with h5py.File(testfile, 'r') as f:
         test_loader = get_loader(f)
         accs = testing_loop(test_loader,model)
-        print("Top 1 Novel : \n".format(accs[0]))
-#         print('\nTop 1 Base : \n'.format(accs[2]))
+        print("\nTop 1 Novel : {}".format(accs[0]))
+        print("Top 5 Novel : {}\n".format(accs[1]))
