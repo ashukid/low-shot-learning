@@ -13,21 +13,21 @@ Running the low-shot learning code will involve four steps:
 Remove all the corrput images. 
 Use the script data_cleaning.py.
 
-`python data_cleaning.py --dataset_folder LouisVuitton`
+    `python data_cleaning.py --dataset_folder LouisVuitton`
 
 
 ### Split classes into base and novel
 Split all classes into - 2. Threshold parameter decides how many images a class should countain to be called as base class. 
 Use the script tuple_generator.py
 
-`python tuple_generator.py --dataset_folder LouisVuitton --threshold 150`
+    `python tuple_generator.py --dataset_folder LouisVuitton --threshold 150`
 
 
 ### Creating Validation dataset
 Create a separate folder for validation data. Inside the folder create folder for each classes and put the validation data. 
 Use the script prepare_validation_data.py
 
-`python prepare_validation_data.py --dataset_folder LouisVuitton --test_folder LouisVuitton-test --test_images 50
+    `python prepare_validation_data.py --dataset_folder LouisVuitton --test_folder LouisVuitton-test --test_images 50`
 
 
 ### Training a ConvNet representation
@@ -51,7 +51,7 @@ The model checkpoints will be saved as epoch-number.tar. Training by default run
 
 
 ### Saving features from the ConvNet
-The next step is to save features from the trained ConvNet. This is fairly straightforward: first, create a directory to save the features in, and then save the features for the train set and the validation set. Thus, for the ResNet10 model trained above:
+The next step is to save features from the trained ConvNet. This is fairly straightforward: first, create a directory to save the features in , and then save the features for the train set and the validation set. Specify the root folders for train and valid set in `train_save_data.yaml` and `val_save_data.yaml` files. Thus, for the ResNet10 model trained above:
     
     mkdir -p features/ResNet10_sgm
     python ./save_features.py \
@@ -65,7 +65,23 @@ The next step is to save features from the trained ConvNet. This is fairly strai
       --modelfile checkpoints/ResNet10_sgm/89.tar \
       --model ResNet10
 
+### Finetuning last layer for novel classes
+The next step is fine tune last layer with novel classes data.
+```
+    python fine_tuning_last_layer.py \
+    --trainfile features/new-folder/train.hdf5\
+    --testfile features/new-folder/val.hdf5\
+    --maxiters 10000
+    
+```
 
 
-
+### Testing
+Final step is testing on single image.
+```
+    pythin testing_on_single_image.py\
+    --config testing.yaml\
+    --image_path image.jpg
+    
+```
 
