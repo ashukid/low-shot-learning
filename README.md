@@ -1,3 +1,6 @@
+#### This repository is extension of official repository `https://github.com/facebookresearch/low-shot-shrink-hallucinate`, with added functions to run the code on any generic dataset. 
+
+
 ## Running the Code
 
 
@@ -5,21 +8,21 @@
 Remove all the corrput images. 
 Use the script data_cleaning.py.
 
-    python data_cleaning.py --dataset_folder LouisVuitton
+    python data_cleaning.py --dataset_folder "dataset_path"
 
 
 ### Split classes into base and novel
 Split all classes into - 2. Threshold parameter decides how many images a class should countain to be called as base class. 
 Use the script tuple_generator.py
 
-    python tuple_generator.py --dataset_folder LouisVuitton --threshold 150
+    python tuple_generator.py --dataset_folder "dataset_path" --threshold 150
 
 
 ### Creating Validation dataset
 Create a separate folder for validation data. Inside the folder create folder for each classes and put the validation data. 
 Use the script prepare_validation_data.py
 
-    python prepare_validation_data.py --dataset_folder LouisVuitton --test_folder LouisVuitton-test --test_images 50
+    python prepare_validation_data.py --dataset_folder "dataset_path" --test_folder "test_dataset_path" --test_images 50
 
 
 ### Training a ConvNet representation
