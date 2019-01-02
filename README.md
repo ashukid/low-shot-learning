@@ -1,4 +1,4 @@
-#### This repository is extension of official repository `https://github.com/facebookresearch/low-shot-shrink-hallucinate`, with added functions to run the code on any generic dataset. 
+#### This repository is extension of official repository [facebookresearch/low-shot-shrink-hallucinate](https://github.com/facebookresearch/low-shot-shrink-hallucinate), with added functions to run the code on any generic dataset. 
 
 
 ## Running the Code
@@ -65,7 +65,7 @@ The next step is fine tune last layer with novel classes data.
 
 
 ### Testing
-Final step is testing on single image.
+Final step is testing. You can either test on single image using `testing_on_single_image.py` script or test on a folder of images using `testing_script_with_feature_extraction.py`. You can even use extracted features for testing using the script `testing_image_with_extracted_features.py`
 
     python testing_on_single_image.py \
     --model ResNet10
@@ -73,5 +73,6 @@ Final step is testing on single image.
     --modelfile checkpoints/ResNet10_sgm/89.tar \ 
     --num_classes 10378\
     --image_path image.jpg \
+    
     
 
